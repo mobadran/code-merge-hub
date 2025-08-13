@@ -1,17 +1,12 @@
-import prisma from "@/lib/prisma";
+"use client";
 
-export default async function Home() {
-  const users = await prisma.user.findMany();
+import { signOut } from "next-auth/react";
 
-  console.log(users);
+export default function App() {
   return (
     <>
       <h1>Hello World</h1>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>{user.name}</li>
-        ))}
-      </ul>
+      <button onClick={() => signOut()}>Sign Out</button>
     </>
   );
 }
