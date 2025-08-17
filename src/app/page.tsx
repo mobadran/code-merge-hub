@@ -1,12 +1,36 @@
-"use client";
+import prisma from "@/lib/prisma";
+import NewPostButton from "@/components/new-post-button";
+import PostCard from "@/components/post-card";
 
-import { signOut } from "next-auth/react";
-
-export default function App() {
+export default async function App() {
+  const posts = await prisma.post.findMany({
+    include: {
+      author: {
+        select: {
+          name: true,
+          username: true,
+          avatarUrl: true,
+        },
+      },
+    },
+  });
   return (
-    <>
-      <h1>Hello World</h1>
-      <button onClick={() => signOut()}>Sign Out</button>
-    </>
+    <main className="p-4">
+      <div className="flex justify-between items-center">
+        <h2>Posts</h2>
+        <NewPostButton />
+      </div>
+      {posts.length > 0 ? (
+        <ul className="mt-4">
+          {posts.map((post) => (
+            <li key={post.id}>
+              <PostCard post={post} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No posts found</p>
+      )}
+    </main>
   );
 }
