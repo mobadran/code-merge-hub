@@ -17,13 +17,13 @@ export default async function App() {
   return (
     <main className="p-4">
       <div className="flex justify-between items-center">
-        <h2>Posts</h2>
+        <h1>Code Merge Hub</h1>
         <NewPostButton />
       </div>
       {posts.length > 0 ? (
-        <ul className="mt-4">
+        <ul className="mt-4 flex flex-col items-center gap-4">
           {posts.map((post) => (
-            <li key={post.id}>
+            <li key={post.id} className="w-160">
               <PostCard post={post} />
             </li>
           ))}
