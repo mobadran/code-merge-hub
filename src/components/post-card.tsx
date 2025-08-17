@@ -10,25 +10,26 @@ import { PostWithAuthor } from "@/types/post";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { MessageSquare, Share2, ThumbsUp, ArrowRight } from "lucide-react";
+import NO_PFP from "@/../public/no-pfp.jpeg";
 
 export default function PostCard({ post }: { post: PostWithAuthor }) {
   // Show read more if content is longer than 200 characters
   const showReadMore = post.content.length > 200;
-  const displayContent = showReadMore ? `${post.content.substring(0, 200)}...` : post.content;
+  const displayContent = showReadMore
+    ? `${post.content.substring(0, 200)}...`
+    : post.content;
   return (
     <Card className="w-full overflow-hidden rounded-lg shadow-sm border-0 p-0 gap-0">
       {/* Author info */}
       <CardHeader className="flex items-center space-x-3 p-4 pb-0">
-        {post.author.avatarUrl && (
-          <div className="relative h-10 w-10 rounded-full overflow-hidden">
-            <Image
-              src={post.author.avatarUrl}
-              alt={post.author.name || "Author"}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
+        <div className="relative h-10 w-10 rounded-full overflow-hidden">
+          <Image
+            src={post.author.avatarUrl || NO_PFP}
+            alt={post.author.name || "Author"}
+            fill
+            className="object-cover"
+          />
+        </div>
         <div>
           <p className="font-medium">{post.author.name}</p>
           <p className="text-xs text-muted-foreground">
@@ -47,12 +48,10 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
           {post.title}
         </CardTitle>
         <div>
-          <p className="text-foreground">
-            {displayContent}
-          </p>
+          <p className="text-foreground">{displayContent}</p>
           {showReadMore && (
             <div className="mt-2">
-              <Link 
+              <Link
                 href={`/posts/${post.id}`}
                 className="text-sm text-blue-500 hover:text-blue-700 flex items-center gap-1 w-fit"
               >

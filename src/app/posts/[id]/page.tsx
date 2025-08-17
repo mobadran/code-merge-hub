@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+import NO_PFP from "@/../public/no-pfp.jpeg";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -60,16 +61,14 @@ export default async function PostPage({ params }: { params: { id: string } }) {
           <header className="mb-6">
             <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
             <div className="flex items-center gap-4 text-muted-foreground text-sm">
-              {post.author.avatarUrl && (
-                <div className="relative h-8 w-8 rounded-full overflow-hidden">
-                  <Image
-                    src={post.author.avatarUrl}
-                    alt={post.author.name || "Author"}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+              <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                <Image
+                  src={post.author.avatarUrl || NO_PFP}
+                  alt={post.author.name || "Author"}
+                  fill
+                  className="object-cover"
+                />
+              </div>
               <div>
                 <p className="font-medium">
                   {post.author.name || `@${post.author.username}`}
