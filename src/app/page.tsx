@@ -13,6 +13,9 @@ export default async function App() {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
   return (
     <main className="p-4">

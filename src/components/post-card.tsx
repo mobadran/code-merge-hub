@@ -33,10 +33,12 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
         <div>
           <p className="font-medium">{post.author.name}</p>
           <p className="text-xs text-muted-foreground">
-            {new Date(post.createdAt).toLocaleDateString("en-US", {
+            {new Date(post.createdAt).toLocaleString("en-US", {
               year: "numeric",
               month: "short",
               day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
             })}
           </p>
         </div>
