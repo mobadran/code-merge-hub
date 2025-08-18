@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageSquare, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import NO_PFP from "@/../public/no-pfp.jpeg";
@@ -56,23 +56,44 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
         <div className="p-6">
           {/* Post Header */}
-          <header className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
-            <div className="flex items-center gap-4 text-muted-foreground text-sm">
-              <div className="relative h-8 w-8 rounded-full overflow-hidden">
-                <Image
-                  src={post.author.avatarUrl || NO_PFP}
-                  alt={post.author.name || "Author"}
-                  fill
-                  className="object-cover"
-                />
+          <header className="mb-6 flex justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+              <div className="flex items-center gap-4 text-muted-foreground text-sm">
+                <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                  <Image
+                    src={post.author.avatarUrl || NO_PFP}
+                    alt={post.author.name || "Author"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">
+                    {post.author.name || `@${post.author.username}`}
+                  </p>
+                  <Time timestamp={post.createdAt.toISOString()} />
+                </div>
               </div>
-              <div>
-                <p className="font-medium">
-                  {post.author.name || `@${post.author.username}`}
-                </p>
-                <Time timestamp={post.createdAt.toISOString()} />
-              </div>
+            </div>
+            {/* Likes & Comments */}
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <ThumbsUp className="h-4 w-4" />
+                <p className="text-xs text-muted-foreground">132 likes</p>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <p className="text-xs text-muted-foreground">12 comments</p>
+              </Button>
             </div>
           </header>
 

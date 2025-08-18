@@ -75,7 +75,6 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
         </div>
       )}
 
-      {/* Action buttons */}
       <CardFooter className="flex justify-between p-2 border-t-1">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
