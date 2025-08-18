@@ -9,8 +9,9 @@ import {
 import { PostWithAuthor } from "@/types/post";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { MessageSquare, Share2, ThumbsUp, ArrowRight } from "lucide-react";
+import { MessageSquare, ThumbsUp, ArrowRight } from "lucide-react";
 import NO_PFP from "@/../public/no-pfp.jpeg";
+import Time from "./time";
 
 export default function PostCard({ post }: { post: PostWithAuthor }) {
   // Show read more if content is longer than 200 characters
@@ -18,6 +19,7 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
   const displayContent = showReadMore
     ? `${post.content.substring(0, 200)}...`
     : post.content;
+
   return (
     <Card className="w-full overflow-hidden rounded-lg shadow-sm border-0 p-0 gap-0">
       {/* Author info */}
@@ -32,15 +34,11 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
         </div>
         <div>
           <p className="font-medium">{post.author.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {new Date(post.createdAt).toLocaleString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-            })}
-          </p>
+          <Time
+            timestamp={post.createdAt.toISOString()}
+            type="relative"
+            className="text-xs text-muted-foreground"
+          />
         </div>
       </CardHeader>
 
@@ -86,14 +84,10 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <Share2 className="h-4 w-4" />
-          </Button>
         </div>
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">132 likes</p>
           <p className="text-xs text-muted-foreground">12 comments</p>
-          <p className="text-xs text-muted-foreground">12 shares</p>
         </div>
       </CardFooter>
     </Card>

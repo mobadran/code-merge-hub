@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
 import NO_PFP from "@/../public/no-pfp.jpeg";
+import Time from "@/components/time";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -28,8 +28,6 @@ export default async function PostPage({ params }: { params: { id: string } }) {
   if (!post) {
     notFound();
   }
-
-  const formattedDate = formatDate(new Date(post.createdAt));
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -73,9 +71,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
                 <p className="font-medium">
                   {post.author.name || `@${post.author.username}`}
                 </p>
-                <time dateTime={post.createdAt.toISOString()}>
-                  {formattedDate}
-                </time>
+                <Time timestamp={post.createdAt.toISOString()} />
               </div>
             </div>
           </header>
