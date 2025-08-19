@@ -7,7 +7,6 @@ import { authOptions } from "@/lib/auth";
 const postSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
   content: z.string().min(1, "Content is required"),
-  mediaUrls: z.array(z.string().url()).optional().default([]),
 });
 
 export async function POST(request: Request) {
@@ -54,7 +53,6 @@ export async function POST(request: Request) {
         data: {
           title: validation.data.title,
           content: validation.data.content,
-          mediaUrls: validation.data.mediaUrls,
           author: {
             connect: { id: user.id },
           },
@@ -63,7 +61,6 @@ export async function POST(request: Request) {
           id: true,
           title: true,
           content: true,
-          mediaUrls: true,
           createdAt: true,
           updatedAt: true,
           author: {

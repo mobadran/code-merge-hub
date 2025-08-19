@@ -14,26 +14,25 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import UploadMedia from "./upload-media";
 
 export default function NewPostButton() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
-  const [currentMediaUrl, setCurrentMediaUrl] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!title.trim()) {
       newErrors.title = "Title is required";
     } else if (title.length > 100) {
       newErrors.title = "Title must be 100 characters or less";
     }
-    
+
     if (!content.trim()) {
       newErrors.content = "Content is required";
     }
@@ -42,31 +41,9 @@ export default function NewPostButton() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAddMediaUrl = () => {
-    if (!currentMediaUrl) return;
-    
-    try {
-      // Basic URL validation
-      new URL(currentMediaUrl);
-      setMediaUrls([...mediaUrls, currentMediaUrl]);
-      setCurrentMediaUrl("");
-      if (errors.mediaUrls) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { mediaUrls: _, ...restErrors } = errors;
-        setErrors(restErrors);
-      }
-    } catch {
-      setErrors({ ...errors, mediaUrls: "Please enter a valid URL" });
-    }
-  };
-
-  const handleRemoveMediaUrl = (index: number) => {
-    setMediaUrls(mediaUrls.filter((_, i) => i !== index));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -76,13 +53,9 @@ export default function NewPostButton() {
     try {
       const response = await fetch("/api/posts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           title: title.trim(),
           content: content.trim(),
-          mediaUrls,
         }),
       });
 
@@ -96,17 +69,18 @@ export default function NewPostButton() {
       // Reset form and close dialog
       setTitle("");
       setContent("");
-      setMediaUrls([]);
       setErrors({});
-      
+
       // Refresh the page to show the new post
       router.refresh();
       setOpen(false);
-      
+
       toast.success("Your post has been created.");
     } catch (error) {
       console.error("Error creating post:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to create post");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create post"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +98,7 @@ export default function NewPostButton() {
             Share your thoughts with the community
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
@@ -139,7 +113,7 @@ export default function NewPostButton() {
               <p className="text-sm text-red-500">{errors.title}</p>
             )}
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="content">Content *</Label>
             <textarea
@@ -156,50 +130,26 @@ export default function NewPostButton() {
               <p className="text-sm text-red-500">{errors.content}</p>
             )}
           </div>
-          
-          <div className="space-y-2">
-            <Label>Media URLs (optional)</Label>
-            <div className="flex space-x-2">
-              <Input
-                type="url"
-                value={currentMediaUrl}
-                onChange={(e) => setCurrentMediaUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddMediaUrl}
-                disabled={!currentMediaUrl}
-              >
-                Add
-              </Button>
-            </div>
-            {errors.mediaUrls && (
-              <p className="text-sm text-red-500">{errors.mediaUrls}</p>
-            )}
-            
-            {mediaUrls.length > 0 && (
-              <div className="mt-2 space-y-1">
-                {mediaUrls.map((url, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-100 rounded">
-                    <span className="text-sm truncate max-w-[400px]">{url}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveMediaUrl(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
+
+          <UploadMedia
+            endpoint="/api/posts/presigned-url"
+            accept="image/jpeg, image/png, image/webp, image/gif, image/heic, image/heif, video/mp4, video/webm, video/quicktime, video/x-matroska, video/x-msvideo"
+            onUploaded={(url) => console.log("Uploaded:", url)}
+          >
+            {({ selectFile, isUploading, progress, error, file }) => (
+              <div>
+                <button
+                  onClick={selectFile}
+                  type="button"
+                  disabled={isUploading}
+                >
+                  {isUploading ? `Uploading... ${progress}%` : "Choose file"}
+                </button>
+                {file && <p>Selected: {file.name}</p>}
+                {error && <p style={{ color: "red" }}>{error}</p>}
               </div>
             )}
-          </div>
-          
+          </UploadMedia>
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               type="button"
