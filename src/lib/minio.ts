@@ -8,5 +8,4 @@ export const minioClient = new Client({
   secretKey: process.env.MINIO_SECRET_KEY!,
 });
 
-export const PUBLIC_BUCKET = process.env.MINIO_PUBLIC_BUCKET!;
-export const PRIVATE_BUCKET = process.env.MINIO_PRIVATE_BUCKET!;
+export const BUCKET = process.env.MINIO_BUCKET!;

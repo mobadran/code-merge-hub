@@ -22,6 +22,7 @@ export default function NewPostButton() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
   const router = useRouter();
 
   const validateForm = () => {
@@ -56,6 +57,7 @@ export default function NewPostButton() {
         body: JSON.stringify({
           title: title.trim(),
           content: content.trim(),
+          mediaUrl,
         }),
       });
 
@@ -134,7 +136,7 @@ export default function NewPostButton() {
           <UploadMedia
             endpoint="/api/posts/presigned-url"
             accept="image/jpeg, image/png, image/webp, image/gif, image/heic, image/heif, video/mp4, video/webm, video/quicktime, video/x-matroska, video/x-msvideo"
-            onUploaded={(url) => console.log("Uploaded:", url)}
+            onUploaded={(url) => setMediaUrl(url)}
           >
             {({ selectFile, isUploading, progress, error, file }) => (
               <div>

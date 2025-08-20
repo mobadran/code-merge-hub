@@ -55,14 +55,16 @@ export default function UploadMedia({
       // Step 1: request presigned POST from server
       const presignRes = await fetch(
         endpoint + "?contentType=" + selected.type
-      );
+      ).catch(() => {
+        throw new Error("Failed to get presigned URL");
+      });
 
       if (!presignRes.ok) {
         throw new Error("Failed to get presigned URL");
       }
 
       const { postURL: url, formData: fields } = await presignRes.json();
-      console.log(url, fields);
+      console.log(fields.key);
 
       // Step 2: build FormData
       const formData = new FormData();

@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import { minioClient, PRIVATE_BUCKET } from "@/lib/minio";
+import { minioClient, BUCKET } from "@/lib/minio";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { v7 as uuidv7 } from "uuid";
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
   }
 
   const policy = minioClient.newPostPolicy();
-  policy.setBucket(PRIVATE_BUCKET);
+  policy.setBucket(BUCKET);
   policy.setContentType(contentType);
   policy.setKey(`posts-media/${uuidv7()}.${fileExtension}`);
   policy.setContentLengthRange(0, 10 * 1024 * 1024); // 10MB
