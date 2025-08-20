@@ -28,8 +28,9 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
           <Image
             src={post.author.avatarUrl || NO_PFP}
             alt={post.author.name || "Author"}
-            fill
             className="object-cover"
+            width={40}
+            height={40}
           />
         </div>
         <div>
@@ -69,8 +70,9 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
           <Image
             src={post.mediaUrls[0]}
             alt={post.title}
-            fill
-            className="object-cover"
+            className="object-cover h-auto w-full"
+            width={800}
+            height={450}
           />
         </div>
       )}
