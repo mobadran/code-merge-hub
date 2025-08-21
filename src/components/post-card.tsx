@@ -65,17 +65,19 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
       </CardContent>
 
       {/* Media */}
-      {post.mediaUrls?.[0] && (
-        <div className="relative w-full aspect-video">
-          <Image
-            src={post.mediaUrls[0]}
-            alt={post.title}
-            className="object-cover h-auto w-full"
-            width={800}
-            height={450}
-          />
-        </div>
-      )}
+      <div className="post-attachments">
+        {post.mediaUrls.map((url, index) => (
+          <div className="relative w-full aspect-video" key={index}>
+            <Image
+              src={url}
+              alt={post.title}
+              className="object-cover h-auto w-full"
+              width={800}
+              height={450}
+            />
+          </div>
+        ))}
+      </div>
 
       <CardFooter className="flex justify-between p-2 border-t-1">
         <div className="flex items-center gap-2">

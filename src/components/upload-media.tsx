@@ -7,7 +7,7 @@ type UploadMediaProps = {
   endpoint: string;
 
   /** Optional callback when upload succeeds */
-  onUploaded?: (url: string) => void;
+  onUploaded?: (urls: string[]) => void;
 
   /** Optional callback when upload fails */
   onError?: (error: Error) => void;
@@ -18,11 +18,14 @@ type UploadMediaProps = {
     isUploading: boolean;
     progress: number;
     error: string | null;
-    file: File | null;
+    files: File[];
   }) => React.ReactNode;
 
   /** Restrict file types (image/*, video/*, etc.) */
   accept?: string;
+
+  /** Allow multiple file selection */
+  multiple?: boolean;
 };
 
 export default function UploadMedia({
@@ -33,7 +36,7 @@ export default function UploadMedia({
   accept,
 }: UploadMediaProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -43,60 +46,77 @@ export default function UploadMedia({
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
-    setFile(selected);
+    const selectedFiles = Array.from(e.target.files || []);
+    if (selectedFiles.length === 0) return;
+
+    setFiles(selectedFiles);
 
     try {
       setError(null);
       setIsUploading(true);
       setProgress(0);
 
-      // Step 1: request presigned POST from server
-      const presignRes = await fetch(
-        endpoint + "?contentType=" + selected.type
-      ).catch(() => {
-        throw new Error("Failed to get presigned URL");
-      });
+      const uploadedUrls: string[] = [];
 
-      if (!presignRes.ok) {
-        throw new Error("Failed to get presigned URL");
+      // Process each file sequentially
+      for (const file of selectedFiles) {
+        // Step 1: request presigned POST from server
+        const presignRes = await fetch(
+          endpoint + "?contentType=" + file.type
+        ).catch(() => {
+          throw new Error("Failed to get presigned URL");
+        });
+
+        if (!presignRes.ok) {
+          throw new Error("Failed to get presigned URL");
+        }
+
+        const { postURL: url, formData: fields } = await presignRes.json();
+
+        // Step 2: build FormData
+        const formData = new FormData();
+        Object.entries(fields).forEach(([k, v]) => {
+          formData.append(k, v as string);
+        });
+        formData.append("file", file);
+
+        // Step 3: upload to MinIO directly
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", url, true);
+
+          xhr.upload.onprogress = (evt) => {
+            if (evt.lengthComputable) {
+              // Update progress for the current file
+              const fileProgress = Math.round((evt.loaded / evt.total) * 100);
+              // Calculate overall progress across all files
+              const fileIndex = selectedFiles.indexOf(file);
+              const progressPerFile = 100 / selectedFiles.length;
+              const baseProgress = (fileIndex / selectedFiles.length) * 100;
+              const currentFileProgress =
+                (fileProgress / 100) * progressPerFile;
+              setProgress(baseProgress + currentFileProgress);
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status === 204) {
+              const fileUrl = `${url}/${fields.key}`;
+              uploadedUrls.push(fileUrl);
+              resolve();
+            } else {
+              reject(new Error(`Upload failed for file: ${file.name}`));
+            }
+          };
+
+          xhr.onerror = () =>
+            reject(new Error(`Upload failed for file: ${file.name}`));
+          xhr.send(formData);
+        });
       }
 
-      const { postURL: url, formData: fields } = await presignRes.json();
-      console.log(fields.key);
-
-      // Step 2: build FormData
-      const formData = new FormData();
-      Object.entries(fields).forEach(([k, v]) => {
-        formData.append(k, v as string);
-      });
-      formData.append("file", selected);
-
-      // Step 3: upload to MinIO directly
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-
-        xhr.upload.onprogress = (evt) => {
-          if (evt.lengthComputable) {
-            setProgress(Math.round((evt.loaded / evt.total) * 100));
-          }
-        };
-
-        xhr.onload = () => {
-          if (xhr.status === 204) {
-            setProgress(100);
-            onUploaded?.(`${url}/${fields.key}`);
-            resolve();
-          } else {
-            reject(new Error("Upload failed"));
-          }
-        };
-
-        xhr.onerror = () => reject(new Error("Upload failed"));
-        xhr.send(formData);
-      });
+      // All files uploaded successfully
+      onUploaded?.(uploadedUrls);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
@@ -110,13 +130,20 @@ export default function UploadMedia({
   return (
     <>
       <input
-        ref={inputRef}
         type="file"
-        hidden
-        accept={accept}
+        ref={inputRef}
         onChange={handleFileChange}
+        className="hidden"
+        accept={accept}
+        multiple
       />
-      {children({ selectFile, isUploading, progress, error, file })}
+      {children({
+        selectFile,
+        isUploading,
+        progress,
+        error,
+        files,
+      })}
     </>
   );
 }

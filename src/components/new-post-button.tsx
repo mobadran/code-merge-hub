@@ -22,7 +22,7 @@ export default function NewPostButton() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const router = useRouter();
 
   const validateForm = () => {
@@ -54,10 +54,13 @@ export default function NewPostButton() {
     try {
       const response = await fetch("/api/posts", {
         method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           title: title.trim(),
           content: content.trim(),
-          mediaUrl,
+          mediaUrls,
         }),
       });
 
@@ -133,25 +136,45 @@ export default function NewPostButton() {
             )}
           </div>
 
-          <UploadMedia
-            endpoint="/api/posts/presigned-url"
-            accept="image/jpeg, image/png, image/webp, image/gif, image/heic, image/heif, video/mp4, video/webm, video/quicktime, video/x-matroska, video/x-msvideo"
-            onUploaded={(url) => setMediaUrl(url)}
-          >
-            {({ selectFile, isUploading, progress, error, file }) => (
-              <div>
-                <button
-                  onClick={selectFile}
-                  type="button"
-                  disabled={isUploading}
-                >
-                  {isUploading ? `Uploading... ${progress}%` : "Choose file"}
-                </button>
-                {file && <p>Selected: {file.name}</p>}
-                {error && <p style={{ color: "red" }}>{error}</p>}
-              </div>
-            )}
-          </UploadMedia>
+          <div className="space-y-2">
+            <Label>Media (optional)</Label>
+            <UploadMedia
+              endpoint="/api/posts/presigned-url"
+              accept="image/jpeg, image/png, image/webp, image/gif, image/heic, image/heif, video/mp4, video/webm, video/quicktime, video/x-matroska, video/x-msvideo"
+              onUploaded={(urls) => setMediaUrls(urls)}
+              multiple
+            >
+              {({ selectFile, isUploading, progress, error, files }) => (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={selectFile}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? `Uploading... ${progress}%` : "Choose Files"}
+                    </Button>
+                    {files.length > 0 && (
+                      <span className="text-sm text-muted-foreground">
+                        {files.length} file{files.length > 1 ? 's' : ''} selected
+                      </span>
+                    )}
+                  </div>
+                  {files.length > 0 && (
+                    <div className="space-y-1">
+                      {files.map((file, index) => (
+                        <div key={index} className="text-sm text-muted-foreground">
+                          • {file.name} ({Math.round(file.size / 1024)} KB)
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+                </div>
+              )}
+            </UploadMedia>
+          </div>
           <div className="flex justify-end space-x-2 pt-4">
             <Button
               type="button"
