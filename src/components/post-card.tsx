@@ -6,15 +6,16 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { PostWithAuthor } from "@/types/post";
+import { PostWithExtras } from "@/types/post";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { MessageSquare, ThumbsUp, ArrowRight } from "lucide-react";
+import { MessageSquare, ArrowRight } from "lucide-react";
 import NO_PFP from "@/../public/no-pfp.jpeg";
 import Time from "./time";
 import PostAttachments from "./post-attachments";
+import { LikeButton } from "./like-button";
 
-export default function PostCard({ post }: { post: PostWithAuthor }) {
+export default function PostCard({ post }: { post: PostWithExtras }) {
   // Show read more if content is longer than 200 characters
   const showReadMore = post.content.length > 200;
   const displayContent = showReadMore
@@ -91,16 +92,14 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
 
       <CardFooter className="flex justify-between p-2 border-t-1">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <ThumbsUp className="h-4 w-4" />
-          </Button>
+          <LikeButton
+            postId={post.id}
+            isLiked={post.isLiked}
+            initialLikeCount={post._count.likes}
+          />
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
           </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <p className="text-xs text-muted-foreground">132 likes</p>
-          <p className="text-xs text-muted-foreground">12 comments</p>
         </div>
       </CardFooter>
     </Card>

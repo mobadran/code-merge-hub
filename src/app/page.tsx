@@ -1,22 +1,15 @@
-import prisma from "@/lib/prisma";
 import NewPostButton from "@/components/new-post-button";
 import PostCard from "@/components/post-card";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getPosts } from "./repositories/post-repo";
 
 export default async function App() {
-  const posts = await prisma.post.findMany({
-    include: {
-      author: {
-        select: {
-          name: true,
-          username: true,
-          avatarUrl: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const session = await getServerSession(authOptions);
+
+  const posts = await getPosts(session!);
+  console.log(posts);
+
   return (
     <main className="p-4">
       <div className="flex justify-between items-center">

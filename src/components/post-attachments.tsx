@@ -1,6 +1,5 @@
 "use client";
 
-import { PostWithAuthor } from "@/types/post";
 import {
   Carousel,
   CarouselApi,
@@ -20,13 +19,14 @@ import {
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Post } from "@prisma/client";
 
 export default function PostAttachments({
   post,
   startingImageIndex,
   children,
 }: {
-  post: PostWithAuthor;
+  post: Post;
   startingImageIndex: number;
   children: React.ReactNode;
 }) {
@@ -124,7 +124,7 @@ function CarouselThumbnails({
   selectedImageIndex,
 }: {
   setSelectedImageIndex: (index: number) => void;
-  post: PostWithAuthor;
+  post: Post;
   selectedImageIndex: number;
 }) {
   const [emblaApi, setEmblaApi] = useState<CarouselApi | null>(null);

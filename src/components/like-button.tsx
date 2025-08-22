@@ -1,0 +1,64 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { ThumbsUp } from "lucide-react";
+import { useState } from "react";
+
+export function LikeButton({
+  postId,
+  isLiked,
+  initialLikeCount,
+}: {
+  postId: number;
+  isLiked: boolean;
+  initialLikeCount: number;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [stateIsLiked, setStateIsLiked] = useState(isLiked);
+  const [likeCount, setLikeCount] = useState(initialLikeCount);
+
+  const toggleLike = async () => {
+    setLoading(true);
+    const nextLiked = !stateIsLiked;
+
+    // optimistic update
+    setStateIsLiked(nextLiked);
+    setLikeCount((prev) => prev + (nextLiked ? 1 : -1));
+
+    try {
+      const response = await fetch(`/api/posts/${postId}/likes`, {
+        method: nextLiked ? "POST" : "DELETE",
+      });
+
+      if (!response.ok) {
+        // rollback
+        setStateIsLiked(!nextLiked);
+        setLikeCount((prev) => prev + (nextLiked ? -1 : 1));
+
+        console.error("Failed to toggle like:", await response.json());
+      }
+    } catch (error) {
+      // rollback on network error
+      setStateIsLiked(!nextLiked);
+      setLikeCount((prev) => prev + (nextLiked ? -1 : 1));
+
+      console.error("Network error while toggling like:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      disabled={loading}
+      variant="ghost"
+      size="sm"
+      aria-pressed={stateIsLiked}
+      className="flex items-center gap-2"
+      onClick={toggleLike}
+    >
+      <ThumbsUp className="h-4 w-4" fill={stateIsLiked ? "#2563eb" : "none"} />
+      <span>{likeCount}</span>
+    </Button>
+  );
+}

@@ -1,9 +1,9 @@
-import { Post } from "@prisma/client";
+import { Post, User } from "@prisma/client";
 
-type PostWithAuthor = Post & {
-  author: {
-    name: string | null;
-    username: string;
-    avatarUrl: string | null;
+type PostWithExtras = Post & {
+  author: Pick<User, "id" | "name" | "username" | "avatarUrl">;
+  _count: {
+    likes: number;
   };
+  isLiked: boolean;
 };

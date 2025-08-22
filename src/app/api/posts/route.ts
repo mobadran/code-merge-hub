@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: "Validation failed",
-          details: validation.error.format(),
+          details: z.treeifyError(validation.error),
         },
         { status: 400 }
       );
