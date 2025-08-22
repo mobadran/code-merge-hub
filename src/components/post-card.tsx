@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import { MessageSquare, ThumbsUp, ArrowRight } from "lucide-react";
 import NO_PFP from "@/../public/no-pfp.jpeg";
 import Time from "./time";
+import PostAttachments from "./post-attachments";
 
 export default function PostCard({ post }: { post: PostWithAuthor }) {
   // Show read more if content is longer than 200 characters
@@ -66,16 +67,25 @@ export default function PostCard({ post }: { post: PostWithAuthor }) {
 
       {/* Media */}
       <div className="post-attachments">
-        {post.mediaUrls.map((url, index) => (
-          <div className="relative w-full aspect-video" key={index}>
-            <Image
-              src={url}
-              alt={post.title}
-              className="object-cover h-auto w-full"
-              width={800}
-              height={450}
-            />
-          </div>
+        {post.mediaUrls.slice(0, 4).map((url, index) => (
+          <PostAttachments post={post} startingImageIndex={index} key={index}>
+            <div className="relative w-full aspect-video">
+              <Image
+                src={url}
+                alt={post.title}
+                className="object-cover h-auto w-full"
+                width={800}
+                height={450}
+              />
+              {index === 3 && post.mediaUrls.length > 4 && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-white text-2xl font-bold">
+                    +{post.mediaUrls.length - 3} more
+                  </div>
+                </div>
+              )}
+            </div>
+          </PostAttachments>
         ))}
       </div>
 
