@@ -8,12 +8,12 @@ import {
 } from "@/components/ui/card";
 import { PostWithExtras } from "@/types/post";
 import Link from "next/link";
-import { Button } from "./ui/button";
-import { MessageSquare, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import NO_PFP from "@/../public/no-pfp.jpeg";
 import Time from "./time";
 import PostAttachments from "./post-attachments";
 import { LikeButton } from "./like-button";
+import CommentButton from "./comment-button";
 
 export default function PostCard({ post }: { post: PostWithExtras }) {
   // Show read more if content is longer than 200 characters
@@ -97,9 +97,11 @@ export default function PostCard({ post }: { post: PostWithExtras }) {
             isLiked={post.isLiked}
             initialLikeCount={post._count.likes}
           />
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-          </Button>
+          <CommentButton
+            postId={post.id}
+            hasCommented={post.hasCommented}
+            initialCommentCount={post._count.comments}
+          />
         </div>
       </CardFooter>
     </Card>

@@ -8,7 +8,6 @@ export default async function App() {
   const session = await getServerSession(authOptions);
 
   const posts = await getPosts(session!);
-  console.log(posts);
 
   return (
     <main className="p-4">
