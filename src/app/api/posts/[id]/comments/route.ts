@@ -13,17 +13,24 @@ export async function POST(
   const { content } = await request.json();
 
   try {
-    await prisma.comment.create({
+    const comment = await prisma.comment.create({
       data: {
         content,
         userId: Number(session?.user.id),
         postId: Number(id),
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
-    return NextResponse.json(
-      { message: "Comment created successfully" },
-      { status: 201 }
-    );
+    return NextResponse.json(comment, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2003") {
