@@ -2,8 +2,14 @@ import { Session } from "next-auth";
 import prisma from "@/lib/prisma";
 import { PostWithExtras } from "@/types/post";
 
-export const getPosts = async (session: Session): Promise<PostWithExtras[]> => {
+export const getPosts = async (
+  session: Session,
+  authorId?: number
+): Promise<PostWithExtras[]> => {
   const postData = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
     include: {
       _count: {
         select: {
