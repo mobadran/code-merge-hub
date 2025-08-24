@@ -2,7 +2,7 @@ import NewPostButton from "@/components/new-post-button";
 import PostCard from "@/components/post-card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getPosts } from "./repositories/post-repo";
+import { getPosts } from "../repositories/post-repo";
 
 export default async function App() {
   const session = await getServerSession(authOptions);

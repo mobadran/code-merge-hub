@@ -7,7 +7,7 @@ import Time from "@/components/time";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LikeButton } from "@/components/like-button";
 import CommentButton from "@/components/comment-button";
-import { getPost } from "@/app/repositories/post-repo";
+import { getPost } from "@/repositories/post-repo";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import PostAttachments from "@/components/post-attachments";
