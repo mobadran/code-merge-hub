@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { useState, useEffect } from "react";
+import { useState, useEffect, KeyboardEvent } from "react";
 import { formatDate } from "@/lib/utils";
 import { CommentWithExtras } from "@/types/post";
 
@@ -31,7 +31,9 @@ export default function CommentButton({
 
   const [comment, setComment] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement> | KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     e.preventDefault();
     if (!comment.trim()) return;
     setPostButtonLoading(true);
@@ -49,7 +51,7 @@ export default function CommentButton({
         throw new Error("Failed to create comment");
       }
       const data = await res.json();
-      setComments((prev) => [...prev, data]);
+      setComments((prev) => [data, ...prev]);
       setComment("");
     } catch (err) {
       console.error("Failed to create comment", err);
@@ -64,7 +66,6 @@ export default function CommentButton({
     try {
       const res = await fetch(`/api/posts/${postId}/comments`);
       const data = await res.json();
-      console.log(data);
       setComments(data);
     } catch (err) {
       console.error("Failed to fetch comments", err);
@@ -106,6 +107,12 @@ export default function CommentButton({
               className="min-h-[100px] resize-none"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
             />
             <div className="flex justify-end">
               <Button type="submit" size="sm" disabled={postButtonLoading}>

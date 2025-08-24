@@ -1,32 +1,28 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MessageSquare, ThumbsUp } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
-import NO_PFP from "@/../public/no-pfp.jpeg";
 import Time from "@/components/time";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LikeButton } from "@/components/like-button";
+import CommentButton from "@/components/comment-button";
+import { getPost } from "@/app/repositories/post-repo";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import PostAttachments from "@/components/post-attachments";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session) return notFound();
   const { id } = await params;
   // If id is not a number, throw a 404 error
   const postId = Number(id) || notFound();
 
-  const post = await prisma.post.findUnique({
-    where: { id: postId },
-    include: {
-      author: {
-        select: {
-          name: true,
-          username: true,
-          avatarUrl: true,
-        },
-      },
-    },
-  });
+  const post = await getPost(postId, session);
 
   if (!post) {
-    notFound();
+    return notFound();
   }
 
   return (
@@ -61,12 +57,12 @@ export default async function PostPage({ params }: { params: { id: string } }) {
               <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
               <div className="flex items-center gap-4 text-muted-foreground text-sm">
                 <div className="relative h-8 w-8 rounded-full overflow-hidden">
-                  <Image
-                    src={post.author.avatarUrl || NO_PFP}
-                    alt={post.author.name || "Author"}
-                    fill
-                    className="object-cover"
-                  />
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={post.author.avatarUrl || ""} />
+                    <AvatarFallback>
+                      {post.author.name?.[0] || post.author.username[0]}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div>
                   <p className="font-medium">
@@ -78,22 +74,16 @@ export default async function PostPage({ params }: { params: { id: string } }) {
             </div>
             {/* Likes & Comments */}
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <ThumbsUp className="h-4 w-4" />
-                <p className="text-xs text-muted-foreground">132 likes</p>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <MessageSquare className="h-4 w-4" />
-                <p className="text-xs text-muted-foreground">12 comments</p>
-              </Button>
+              <LikeButton
+                postId={post.id}
+                isLiked={post.isLiked}
+                initialLikeCount={post._count.likes}
+              />
+              <CommentButton
+                postId={post.id}
+                hasCommented={post.hasCommented}
+                initialCommentCount={post._count.comments}
+              />
             </div>
           </header>
 
@@ -112,12 +102,14 @@ export default async function PostPage({ params }: { params: { id: string } }) {
                     key={index}
                     className="relative aspect-video rounded-lg overflow-hidden"
                   >
-                    <Image
-                      src={url}
-                      alt={`Media ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
+                    <PostAttachments post={post} startingImageIndex={index + 1}>
+                      <Image
+                        src={url}
+                        alt={`Media ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </PostAttachments>
                   </div>
                 ))}
               </div>

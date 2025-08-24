@@ -9,11 +9,11 @@ import {
 import { PostWithExtras } from "@/types/post";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import NO_PFP from "@/../public/no-pfp.jpeg";
 import Time from "./time";
 import PostAttachments from "./post-attachments";
 import { LikeButton } from "./like-button";
 import CommentButton from "./comment-button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export default function PostCard({ post }: { post: PostWithExtras }) {
   // Show read more if content is longer than 200 characters
@@ -27,13 +27,12 @@ export default function PostCard({ post }: { post: PostWithExtras }) {
       {/* Author info */}
       <CardHeader className="flex items-center space-x-3 p-4 pb-0">
         <div className="relative h-10 w-10 rounded-full overflow-hidden">
-          <Image
-            src={post.author.avatarUrl || NO_PFP}
-            alt={post.author.name || "Author"}
-            className="object-cover"
-            width={40}
-            height={40}
-          />
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={post.author.avatarUrl || ""} />
+            <AvatarFallback>
+              {post.author.name?.[0] || post.author.username[0]}
+            </AvatarFallback>
+          </Avatar>
         </div>
         <div>
           <p className="font-medium">{post.author.name}</p>
