@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ThumbsUp } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useState } from "react";
 
 export function LikeButton({
@@ -57,7 +57,7 @@ export function LikeButton({
       className="flex items-center gap-2"
       onClick={toggleLike}
     >
-      <ThumbsUp className="h-4 w-4" fill={stateIsLiked ? "#2563eb" : "none"} />
+      <Heart className="h-4 w-4" fill={stateIsLiked ? "red" : "none"} />
       <span>{likeCount}</span>
     </Button>
   );
