@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { MessageSquare, Heart, Reply } from "lucide-react";
+import { MessageSquare, Reply } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { Textarea } from "./ui/textarea";
 import { useState, useEffect, KeyboardEvent } from "react";
 import { formatDate } from "@/lib/utils";
 import { CommentWithExtras } from "@/types/post";
+import { LikeButton } from "./like-button";
 
 export default function CommentButton({
   postId,
@@ -130,15 +131,15 @@ export default function CommentButton({
               <div key={comment.id} className="group relative">
                 <div className="flex gap-3">
                   <Avatar className="h-8 w-8 mt-1">
-                    <AvatarImage src={comment.user.avatarUrl || ""} />
+                    <AvatarImage src={comment.user?.avatarUrl || ""} />
                     <AvatarFallback>
-                      {comment.user.name?.[0] || comment.user.username[0]}
+                      {comment.user?.name?.[0] || comment.user?.username[0]}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">
-                        {comment.user.name}
+                        {comment.user?.name}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {formatDate(new Date(comment.createdAt))}
@@ -146,10 +147,19 @@ export default function CommentButton({
                     </div>
                     <p className="text-sm mt-1">{comment.content}</p>
                     <div className="flex items-center gap-4 mt-1">
-                      <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                      {/* <button
+                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        // onClick={() => handleLike(comment)}
+                      >
                         <Heart className="h-3.5 w-3.5" />
-                        <span>0</span>
-                      </button>
+                        <span>{comment._count?.likesComment}</span>
+                      </button> */}
+                      <LikeButton
+                        postId={comment.id}
+                        isLiked={comment.isLiked}
+                        initialLikeCount={comment._count?.likesComment}
+                        isComment={true}
+                      />
                       <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                         <Reply className="h-3.5 w-3.5" />
                         Reply

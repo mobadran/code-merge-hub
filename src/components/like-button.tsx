@@ -8,10 +8,12 @@ export function LikeButton({
   postId,
   isLiked,
   initialLikeCount,
+  isComment,
 }: {
   postId: number;
   isLiked: boolean;
   initialLikeCount: number;
+  isComment?: boolean;
 }) {
   const [loading, setLoading] = useState(false);
   const [stateIsLiked, setStateIsLiked] = useState(isLiked);
@@ -26,9 +28,14 @@ export function LikeButton({
     setLikeCount((prev) => prev + (nextLiked ? 1 : -1));
 
     try {
-      const response = await fetch(`/api/posts/${postId}/likes`, {
-        method: nextLiked ? "POST" : "DELETE",
-      });
+      const response = await fetch(
+        isComment
+          ? `/api/comments/${postId}/likes`
+          : `/api/posts/${postId}/likes`,
+        {
+          method: nextLiked ? "POST" : "DELETE",
+        }
+      );
 
       if (!response.ok) {
         // rollback
@@ -48,6 +55,19 @@ export function LikeButton({
     }
   };
 
+  if (isComment) {
+    return (
+      <button
+        disabled={loading}
+        aria-pressed={stateIsLiked}
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={toggleLike}
+      >
+        <Heart className="h-3.5 w-3.5" fill={stateIsLiked ? "red" : "none"} />
+        <span>{likeCount}</span>
+      </button>
+    );
+  }
   return (
     <Button
       disabled={loading}

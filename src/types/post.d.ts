@@ -29,4 +29,10 @@ type CommentWithExtras = Comment & {
     name: string | null;
     avatarUrl: string | null;
   };
+  _count: {
+    likesComment: number;
+    replies: number;
+  };
+  isLiked: boolean;
+  hasCommented: boolean;
 };

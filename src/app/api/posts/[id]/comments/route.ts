@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
-  const { id } = params;
+  const { id } = await params;
   const { content } = await request.json();
 
   try {
@@ -46,7 +46,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   const session = await getServerSession(authOptions);
-  const { id } = params;
+  const { id } = await params;
 
   const result = await prisma.comment.deleteMany({
     where: {
@@ -69,13 +69,20 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const session = await getServerSession(authOptions);
+  const { id } = await params;
 
   const comments = await prisma.comment.findMany({
     where: {
       postId: Number(id),
     },
     include: {
+      _count: {
+        select: {
+          likesComment: true,
+          replies: true,
+        },
+      },
       user: {
         select: {
           id: true,
@@ -84,8 +91,24 @@ export async function GET(
           avatarUrl: true,
         },
       },
+      likesComment: {
+        where: {
+          userId: Number(session?.user.id),
+        },
+      },
+      replies: {
+        where: {
+          userId: Number(session?.user.id),
+        },
+      },
     },
   });
 
-  return NextResponse.json(comments);
+  const commentsWithExtras = comments.map((comment) => ({
+    ...comment,
+    isLiked: (comment.likesComment.length || 0) > 0,
+    hasCommented: (comment.replies.length || 0) > 0,
+  }));
+
+  return NextResponse.json(commentsWithExtras);
 }
