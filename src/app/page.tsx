@@ -1,4 +1,3 @@
-import NewPostButton from "@/components/new-post-button";
 import PostCard from "@/components/post-card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,10 +10,6 @@ export default async function App() {
 
   return (
     <main className="p-4">
-      <div className="flex justify-between items-center">
-        <h1>Code Merge Hub</h1>
-        <NewPostButton />
-      </div>
       {posts.length > 0 ? (
         <ul className="mt-4 flex flex-col items-center gap-4">
           {posts.map((post) => (

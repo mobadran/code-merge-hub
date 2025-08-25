@@ -47,6 +47,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id; // add user ID
         token.avatarUrl = user.avatarUrl; // add avatar URL if you want
+        token.username = user.username;
       }
       return token;
     },
@@ -55,6 +56,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id; // read from token
         session.user.image = token.avatarUrl; // map to session.user.image
+        session.user.username = token.username;
       }
       return session;
     },

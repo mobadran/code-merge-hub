@@ -26,16 +26,21 @@ export default function PostCard({ post }: { post: PostWithExtras }) {
     <Card className="w-full overflow-hidden rounded-lg shadow-sm border-0 p-0 gap-0">
       {/* Author info */}
       <CardHeader className="flex items-center space-x-3 p-4 pb-0">
-        <div className="relative h-10 w-10 rounded-full overflow-hidden">
+        <Link
+          href={`/users/${post.author.username}`}
+          className="relative h-10 w-10 rounded-full overflow-hidden"
+        >
           <Avatar className="h-10 w-10">
             <AvatarImage src={post.author.avatarUrl || ""} />
             <AvatarFallback>
               {post.author.name?.[0] || post.author.username[0]}
             </AvatarFallback>
           </Avatar>
-        </div>
+        </Link>
         <div>
-          <p className="font-medium">{post.author.name}</p>
+          <Link href={`/users/${post.author.username}`}>
+            <p className="font-medium">{post.author.name}</p>
+          </Link>
           <Time
             timestamp={post.createdAt.toISOString()}
             type="relative"
